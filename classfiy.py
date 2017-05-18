@@ -7,11 +7,6 @@ import redis
 
 from util import *
 
-'''
-we need 2 key-value:
-1. key = "machine + size"  value = "family" 
-2. key = "family" value = "feature"
-'''
 r0 = redis.Redis(host='10.66.20.100', port=6379, db=0)
 r1 = redis.Redis(host='10.66.20.100', port=6379, db=1)
 
