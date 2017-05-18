@@ -35,4 +35,4 @@ if __name__=="__main__":
     sample_extract(sample_dir)
     
     #classfiy the sample
-    classfiy(sample_dir, "/media/truecrypt5/botnet/botnet-tracker/script/test")
+    classfiy(sample_dir, "/media/truecrypt5/botnet/tracker/dest")
