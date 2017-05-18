@@ -4,7 +4,6 @@ import os
 import string
 import time
 import redis
-
 from util import *
 
 r0 = redis.Redis(host='10.66.20.100', port=6379, db=0)
@@ -31,7 +30,6 @@ billgates           MainBeikong
 遍历整个列表,与样本作特征匹配,匹配成果返回对应的family,否则返回new
 '''
 def deep_sample_analysis(sample):
-    print "begin deep sample analysis"
     str = strings(sample)
     for family in r1.keys():
         for s in str:
@@ -43,9 +41,7 @@ def deep_sample_analysis(sample):
 查找redis数据库,根据machine、size信息匹配family名称
 '''
 def get_sample_family(machine, size, sample):
-    print "begin get sample family"
     sample_key = machine + "_" + str(size)
-    print "sample_key=%s" % sample_key
     if not r0.exists(sample_key):
         family =  deep_sample_analysis(sample)
         if family == "new":
