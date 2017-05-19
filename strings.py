@@ -7,63 +7,73 @@ import time
 import redis
 from util import *
 
-r0 = redis.Redis(host='10.66.20.100', port=6379, db=0)
-r1 = redis.Redis(host='10.66.20.100', port=6379, db=1)
+class sample_info:
+    '''
+    r0 <1 v 1>: 采用最简单的strings类型, 一个key(machine_size)对应一个value(family)
+    r1 <1 v n>: 采用list类型, 一个key(family)对应多个value(feature)
+    '''
+    r0 = redis.Redis(host='10.66.20.100', port=6379, db=0)
+    r1 = redis.Redis(host='10.66.20.100', port=6379, db=1)
+   
+    def __init__(self, machine=None, size=0, feature=None, family=None):
+        self.machine = machine
+        self.size = size
+        self.feature = feature
+        self.family = family
+    
+    def set_family_machine_size(self, family):
+        if None == family:
+            return
+        db = sample_info.r0
+        key = self.machine + "_" + str(self.size)
+        if not db.exists(key):
+            db.set(key, family)
+            self.family = family
+    
+    def set_family_feature(self, feature):
+        if None == feature:
+            return
+        db = sample_info.r1
+        if db.exists(self.family):
+            for value in db.lrange(self.family, 0, db.llen(self.family)):
+                if value == feature:
+                    return 
+        db.lpush(self.family, feature)
+        self.feature = feature
 
-'''
-family(key)         feature(value)
-tfddos              DealWithDDoS 
-billgates           MainBeikong
-调用该接口输入样本平台、大小、特征相关信息
-'''
-def add_sample_family(machine, size, feature, family):
-    sample_key = machine + "_" + str(size)
-    if not r0.exists(sample_key):
-        r0.set(sample_key, family) 
-    if not r1.exists(family):
-        r1.set(family, feature)
-    return
-
-'''
-family(key)         feature(value)
-tfddos              DealWithDDoS 
-billgates           MainBeikong
-遍历整个列表,与样本作特征匹配,匹配成果返回对应的family,否则返回new
-'''
-def deep_sample_analysis(sample):
-    print "begin deep analysis"
-    str = strings(sample)
-    for family in r1.keys():
-        for s in str:
-            if r1[family].lower() in s.lower():
-                return family
-    return "new"
-
-'''
-查找redis数据库,根据machine、size信息匹配family名称
-'''
-def get_sample_family(machine, size, sample):
-    print "begin get sample family"
-    sample_key = machine + "_" + str(size)
-    if not r0.exists(sample_key):
-        family =  deep_sample_analysis(sample)
-        if family == "new":
-            r0.set(sample_key, "new_"+str(size))
+    def set_sample_family(self, family, feature):
+        self.set_family_machine_size(family)
+        self.set_family_feature(feature)
+    
+    def get_family_by_machine_size(self):
+        db = sample_info.r0
+        key = self.machine + "_" + str(self.size)
+        if db.exists(key):
+            return db.get(key)
         else:
-            r0.set(sample_key, family)
-    return r0.get(sample_key)
+            return None
 
-'''
-add_sample_family("arm",  1001465, "DealWithDDoS", "tfddos")
-add_sample_family("mips", 1156461, "DealWithDDoS", "tfddos")
-add_sample_family("x86",  2426964, "DealWithDDoS", "tfddos")
-add_sample_family("x86", 1223123, "MainBeikong", "billgates")
-add_sample_family("x86", 1135000, "MainBeikong", "billgates")
-add_sample_family("x86", 1521642, "MainBeikong", "billgates")
-get_sample_family("x86", sys.argv[2], sys.argv[1])
-'''
+    def get_family_by_feature(self, str):
+        db = sample_info.r1
+        for family in db.keys():
+            for s in str:
+                len = db.llen(family)
+                for feature in db.lrange(family, 0, len):
+                    if feature.lower() in s.lower():
+                        return family
+        return None
+
+    def get_sample_family(self, sample):
+        self.family = self.get_family_by_machine_size()
+        if None == self.family:
+            str = strings(sample)
+            self.family = self.get_family_by_feature(str)
+
 platform    = sys.argv[1]
 size        = sys.argv[2]
 feature     = sys.argv[3]
 family      = sys.argv[4]
-add_sample_family(platform, size, feature, family)
+sample = sample_info(platform, size, feature=None, family=None)
+sample.set_sample_family("Mr.Black", "Mr.Black")
+sample.get_sample_family(sys.argv[5])
+print sample.family

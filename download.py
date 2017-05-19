@@ -8,15 +8,19 @@ import requests
 
 '''
 todo:
-    1. 排序 去重后的url list;
-    2. HFS server type、IP、打包下载的链接;
-    3. server type;
-    4. HFS服务器版本判断，根据版本找到对应的链接;
+    1. server type;
+    2. HFS服务器版本判断，根据版本找到对应的链接;
 '''
 
 def sort_process(url_file_name):
+    '''
+    Read the url file、split it and extract the [IP,Port,sample_name]
+    Args:
+        url_file_name: the name of the url file
+    Returns:
+        An sorted list of the urls(IP:Port/sample_name)
+    '''
     url_list = []
-    
     file = open(url_file_name)
     for line in file:
         field = re.split(r'[:&/\s]*', line)
@@ -27,7 +31,6 @@ def sort_process(url_file_name):
                 pos = x + 1
                 if (pos + 3) > field_len: #每个list最后一个元素是空格
                     break
-
                 if field[pos + 1].isdigit():
                     url = field[pos] + ":" + field[pos+1] + "/" + field[pos+2]
                 else:
@@ -35,17 +38,18 @@ def sort_process(url_file_name):
                 url_list.append(url)
                 break
     file.close()
-
     return sorted(url_list)
+
 
 def uniq_process(list):
     uniqed_list = []
-    new_url = ""
+    tmp_url = ""
     for url in list:
-        if(string.find(url, new_url) == -1):
-            uniqed_list.append(new_url)
-        new_url = url
+        if(string.find(url, tmp_url) == -1):
+            uniqed_list.append(tmp_url)
+        tmp_url = url
     return uniqed_list
+
 
 def strings2dict_list(list):
     url_list = []
