@@ -8,6 +8,7 @@ import time
 from download import *
 from extract import *
 from classfiy import *
+from url import *
 
 if __name__=="__main__":
     
@@ -23,7 +24,9 @@ if __name__=="__main__":
         
         os.makedirs(sample_dir)
     
-    url_list = url_list_process(sys.argv[1])
+    url = Url(sys.argv[1])
+    
+    Url.url_process()
 
     #download all samples to the sample_dir
     sample_download(url_list, sample_dir)

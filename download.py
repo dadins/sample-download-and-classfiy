@@ -7,65 +7,53 @@ import string
 import requests
 
 '''
-todo:
-    1. server type;
-    2. HFS服务器版本判断，根据版本找到对应的链接;
+1. 把空格替换成":"
+2. 排序
+2. 去重操作(去掉包含关系的)
+3. find "http:",从http之后获取<IP:port, sample_name>
+4. 判断server类型,如果为HFS的,则更新sample_name
 '''
 
-def sort_process(url_file_name):
-    '''
-    Read the url file、split it and extract the [IP,Port,sample_name]
-    Args:
-        url_file_name: the name of the url file
-    Returns:
-        An sorted list of the urls(IP:Port/sample_name)
-    '''
-    url_list = []
-    file = open(url_file_name)
-    for line in file:
-        field = re.split(r'[:&/\s]*', line)
-        field_len = len(field)
-        #print field
-        for x in range(field_len):
-            if field[x] == "http":
-                pos = x + 1
-                if (pos + 3) > field_len: #每个list最后一个元素是空格
-                    break
-                if field[pos + 1].isdigit():
-                    url = field[pos] + ":" + field[pos+1] + "/" + field[pos+2]
-                else:
-                    url = field[pos] + "/" + field[pos+1]
-                url_list.append(url)
-                break
-    file.close()
-    return sorted(url_list)
+class Url:
+    r = redis.Redis(host='10.66.20.100', port=6379, db=2)
+    server = redis.Redis(host='10.66.20.100', port=6379, db=3)
+    
+    def __init__(self, filename, list=""):
+        self.filename = filename
+        self.list = list
+        file = open(self.filename)
+        for url in file:
+            self.list.append(url.replace(' ', ':'))
+        file.close()
 
+    def sort(self):
+        tmp = sorted(self.list)
+        self.list = tmp
+ 
+    def uniq(self):
+        uniq_list = []
+        tmp = ""
+        for url in self.list:
+            if(string.find(url, tmp) == -1):
+                uniq_list.append(tmp)
+            tmp = url
+        self.list = uniq_list   
+    
+    def split(self):
+        for url in self.list:
+            host_beg = url.find("http:") + 5
+            samp_beg = url[host_beg:].find('/')
+            key = url[host_loc:samp_beg]
+            samp_end = url[samp_beg:].find(':')
+            if samp_end == -1:
+                samp_end = url[samp_beg:].find('\n')
+            value = url[samp_beg:samp_end]
+            Url.r.set(key, value)
 
-def uniq_process(list):
-    uniqed_list = []
-    tmp_url = ""
-    for url in list:
-        if(string.find(url, tmp_url) == -1):
-            uniqed_list.append(tmp_url)
-        tmp_url = url
-    return uniqed_list
-
-
-def strings2dict_list(list):
-    url_list = []
-    for line in list:
-        field = re.split(r'[/]', line)
-        key = field[0]
-        value = field[1]
-        tmp_dict = {key:value}
-        url_list.append(tmp_dict)
-    return url_list
-
-def url_list_process(url_file):
-    sorted_list = sort_process(url_file)
-    uniqed_list = uniq_process(sorted_list)
-    url_list = strings2dict_list(uniqed_list)
-    return url_list
+    def url_list_process(self):
+        self.sort()
+        self.uniq()
+        self.split()
 
 def sample_download(list, dst_dir):
     url_list = []

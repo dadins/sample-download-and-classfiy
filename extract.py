@@ -25,7 +25,6 @@ def sample_extract_old(sample_dir):
             r = os.system(cmd)
             move_file(src_path, dst_path)
 
-
 def tar_process(filename, extract_dir):
     try:
         if tarfile.is_tarfile(filename):

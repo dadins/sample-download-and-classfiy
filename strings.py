@@ -73,7 +73,5 @@ platform    = sys.argv[1]
 size        = sys.argv[2]
 feature     = sys.argv[3]
 family      = sys.argv[4]
-sample = sample_info(platform, size, feature=None, family=None)
-sample.set_sample_family("Mr.Black", "Mr.Black")
-sample.get_sample_family(sys.argv[5])
-print sample.family
+sample = sample_info(platform, size, feature, family)
+sample.set_sample_family(family, feature)
