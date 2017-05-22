@@ -10,17 +10,19 @@ from extract import *
 from classfiy import *
 from url import *
 
-if __name__=="__main__":
-    
-    if len(sys.argv) != 3 or not os.path.isfile(sys.argv[1]):
-        print "Usage: python classfiy.py url_file sample_dir classfiy_dir"
+def main():
+    if len(sys.argv) != 2 or not os.path.isfile(sys.argv[1]):
+        print "Usage: python classfiy.py url_file"
         sys.exit(1)
     
     #0. make dir
-    sample_dir = sys.argv[2]
+    sample_dir = "sample_" + time.strftime("%Y%m%d%H%M%S", time.localtime())
+    classfiy_dir = "sample_" + time.strftime("%Y%m%d", time.localtime())
     if not os.path.exists(sample_dir):
         os.makedirs(sample_dir)
-    
+    if not os.path.exists(classfiy_dir):
+        os.makedirs(classfiy_dir)
+
     #1. process url
     url = Url(sys.argv[1])
     url.url_process()
@@ -35,4 +37,7 @@ if __name__=="__main__":
     sample_extract(sample_dir)
 
     #5. classfiy all the samples
-    classfiy(sample_dir, "/media/truecrypt5/botnet/tracker/dest")
+    classfiy(sample_dir, classfiy_dir)
+
+if __name__ == "__main__":
+    main()
