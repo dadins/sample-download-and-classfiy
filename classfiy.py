@@ -112,4 +112,4 @@ def classfiy(dir, dst_dir):
                     os.makedirs(dst)
                 sample_store(sample, os.path.join(dst, file))
 
-classfiy(sys.argv[1], sys.argv[2])
+#classfiy(sys.argv[1], sys.argv[2])
