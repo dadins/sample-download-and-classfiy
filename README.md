@@ -1,2 +1,3 @@
 # sample-download-and-classfiy
-download samples and classfiy automatic
+1. download samples by urls
+2. classfiy samples automatically

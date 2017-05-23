@@ -12,18 +12,6 @@ from util import *
     1. 采用python包等解压缩文件,记录解压缩后的文件类型;
     2. 各种异常的处理;
 '''
-def sample_extract_old(sample_dir):
-    tar_dir = os.path.join(sample_dir, "tar")
-    if not os.path.exists(tar_dir):
-        os.makedirs(tar_dir)
-    
-    for sample in os.listdir(sample_dir):
-        src_path = os.path.join(sample_dir, sample)
-        dst_path = os.path.join(tar_dir, sample)
-        if -1 != string.find(sample, ".tar"):
-            cmd = "tar xf " + src_path + " -C " + sample_dir
-            r = os.system(cmd)
-            move_file(src_path, dst_path)
 
 def tar_process(filename, extract_dir):
     try:

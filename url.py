@@ -1,18 +1,6 @@
 #/usr/bin/env python
 #-*-coding: utf-8 -*-
-import os
-import sys
-import re
-import string
-import requests
 import redis
-import time
-'''
-1. 把空格替换成":",方便后续处理
-2. 排序
-2. 去重操作(去掉包含关系的)
-3. find "http:",从http之后获取<IP:port, sample_name>
-'''
 
 class Url:
     r = redis.Redis(host='10.66.20.100', port=6379, db=2)
@@ -23,10 +11,10 @@ class Url:
         for url in file:
             self.list.append(url.strip('\n'))
         file.close()
-
+    
     def format(self):
         '''
-        0. 提取出http://相关的字符串
+        0. 提取出http://$URL
         1. 将' '替换成':'或'/'
         2. 截断';'后的内容
         '''
@@ -63,7 +51,7 @@ class Url:
         uniq_list = []
         tmp = ""
         for url in self.list:
-            if(url.strip('\n').find(tmp.strip('\n')) == -1):
+            if(url.find(tmp) == -1):
                 uniq_list.append(tmp)
             tmp = url
         if tmp != "":

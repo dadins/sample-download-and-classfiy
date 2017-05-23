@@ -12,7 +12,7 @@ from url import *
 
 def main():
     if len(sys.argv) != 2 or not os.path.isfile(sys.argv[1]):
-        print "Usage: python classfiy.py url_file"
+        print "Usage: python %s url-file" % __file__
         sys.exit(1)
     
     #0. make dir

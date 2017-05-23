@@ -1,15 +1,17 @@
 #/usr/bin/env python
 #-*-coding: utf-8 -*-
 import os
-import sys
-import string
 import requests
-
 from url import *
 
-def sample_download(url_obj, dst_dir):
-    for host in url_obj.r.keys('*'):
-        sample = url_obj.r.get(host)
+def sample_download(obj, dst_dir):
+    '''
+    download the sample by urls
+    obj:     Url object
+    dst_dir: dir which the samples will be stored
+    '''
+    for host in obj.r.keys('*'):
+        sample = obj.r.get(host)
         try:
             url = "http://" + host
             r = requests.get(url, timeout=5)
