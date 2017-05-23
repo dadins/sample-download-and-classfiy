@@ -6,7 +6,7 @@ import re
 import string
 import requests
 import redis
-
+import time
 '''
 1. 把空格替换成":",方便后续处理
 2. 排序
@@ -21,12 +21,40 @@ class Url:
         self.list = list
         file = open(self.filename)
         for url in file:
-            self.list.append(url.replace(' ', ':'))
+            beg = url.find("http://")
+            if beg != -1:
+                end = url.find("-O")
+                if end != -1 and beg < end:
+                    self.list.append(url[beg:end-1].strip('\n'))
+                else:
+                    self.list.append(url[beg:].strip('\n'))
         file.close()
 
+    def format(self):
+        '''
+        1. 将' '替换成':'或'/'
+        2. 截断';'后的内容
+        '''
+        format_list = []
+        for url in self.list:
+            l = len(url)
+            while url[l-1] == ' ':
+                l -= 1
+            url = url[:l]
+            space = url.find(' ')
+            #多个' '的情况下,第1个替换为':',表示端口; 其余的替换为'/',表示路径
+            if (-1 != space) and (-1 != url[space+1:].find(' ')): 
+                url = url.replace(' ', ':', 1)
+            url = url.replace(' ', '/', 1)
+            semicolon = url.find(';')
+            if -1 == semicolon:
+                format_list.append(url)
+            else:
+                format_list.append(url[:semicolon])
+        self.list = format_list
+
     def sort(self):
-        tmp = sorted(self.list)
-        self.list = tmp
+        self.list = sorted(self.list)
 
     def uniq(self):
         uniq_list = []
@@ -37,27 +65,23 @@ class Url:
             tmp = url
         if tmp != "":
             uniq_list.append(tmp)
-        self.list = uniq_list   
+        self.list = uniq_list
     
     def split(self):
         for url in self.list:
-            #extract "host" as key 
+            #extract "host" as key,"sample" as value
             host_beg = url.find("http://")
             if host_beg != -1:
                 host_beg += 7
                 host_len = url[host_beg:].find('/')
                 if host_len != -1:
-                    key = url[host_beg:host_beg+host_len]
-                    #extract "sample" as value
-                    samp_beg = host_beg+host_len + 1
-                    samp_len = url[samp_beg:].find(':')
-                    if samp_len == -1:
-                        samp_len = url[samp_beg:].find('\n')
-                    if samp_len != -1:
-                        value = url[samp_beg:samp_beg+samp_len]
-                        Url.r.set(key, value)
+                    host_end = host_beg+host_len
+                    key = url[host_beg:host_end]
+                    value = url[host_end+1:]
+                    self.r.set(key, value)
 
     def url_process(self):
+        self.format()
         self.sort()
         self.uniq()
         self.split()
