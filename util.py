@@ -46,14 +46,12 @@ def store_md5(md5_file, md5_key, md5_value):
     md5_info = md5_key + "\t" + md5_value + "\n"
     open(md5_file, "a+").write(md5_info)
 
-
 '''
 todo:
     1. 文件类型 平台分类；
     2. windows样本分类;
     3. 根据样本特征，区分样本家族;
 '''
-
 EI_MACHINE = {
         0:"No-machine",
         1:"AT&T-WE-32100",
@@ -299,8 +297,6 @@ def readelf(elf):
         e_entry = ei_entry
         e_phoff, e_shoff, e_flags, e_ehsize, e_phentsize, e_phnum, e_shentsize, e_shnum, e_shstrndx = struct.unpack('QQIHHHHHH', elf.read(32))
     return e_machine
-
-
 
 '''
 impletent of linux strings cmd

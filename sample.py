@@ -28,7 +28,7 @@ def main():
     url.url_process()
     
     #2. download samples by the url and save them to the sample_dir
-    sample_download(sample_dir)
+    sample_download(url, sample_dir)
 
     #3. wait until the sample download completed
     time.sleep(20)

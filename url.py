@@ -21,22 +21,25 @@ class Url:
         self.list = list
         file = open(self.filename)
         for url in file:
-            beg = url.find("http://")
-            if beg != -1:
-                end = url.find("-O")
-                if end != -1 and beg < end:
-                    self.list.append(url[beg:end-1].strip('\n'))
-                else:
-                    self.list.append(url[beg:].strip('\n'))
+            self.list.append(url.strip('\n'))
         file.close()
 
     def format(self):
         '''
+        0. 提取出http://相关的字符串
         1. 将' '替换成':'或'/'
         2. 截断';'后的内容
         '''
         format_list = []
         for url in self.list:
+            beg = url.find("http://")
+            if beg != -1:
+                end = url.find("-O")
+                if end != -1 and beg < end:
+                    url = url[beg:end-1]
+                else:
+                    url = url[beg:]
+            
             l = len(url)
             while url[l-1] == ' ':
                 l -= 1

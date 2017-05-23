@@ -7,9 +7,9 @@ import requests
 
 from url import *
 
-def sample_download(dst_dir):
-    for host in Url.r.keys('*'):
-        sample = Url.r.get(host)
+def sample_download(url_obj, dst_dir):
+    for host in url_obj.r.keys('*'):
+        sample = url_obj.r.get(host)
         try:
             url = "http://" + host
             r = requests.get(url, timeout=5)

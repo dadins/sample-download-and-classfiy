@@ -24,7 +24,7 @@ class sample_info:
     def set_family_machine_size(self, family):
         if None == family:
             return
-        db = sample_info.r0
+        db = self.r0
         key = self.machine + "_" + str(self.size)
         if not db.exists(key):
             db.set(key, family)
@@ -33,7 +33,7 @@ class sample_info:
     def set_family_feature(self, feature):
         if None == feature:
             return
-        db = sample_info.r1
+        db = self.r1
         if db.exists(self.family):
             for value in db.lrange(self.family, 0, db.llen(self.family)):
                 if value == feature:
@@ -46,7 +46,7 @@ class sample_info:
         self.set_family_feature(feature)
     
     def get_family_by_machine_size(self):
-        db = sample_info.r0
+        db = self.r0
         key = self.machine + "_" + str(self.size)
         if db.exists(key):
             return db.get(key)
@@ -54,7 +54,7 @@ class sample_info:
             return None
 
     def get_family_by_feature(self, str):
-        db = sample_info.r1
+        db = self.r1
         for family in db.keys():
             for s in str:
                 len = db.llen(family)
